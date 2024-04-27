@@ -2,19 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    h1 {
+        @apply text-3xl lg:text-4xl font-bold;
+    }
+
+    h2 {
+        @apply text-2xl lg:text-3xl font-bold;
+    }
+
+    h3 {
+        @apply text-xl lg:text-2xl font-bold;
+    }
+}
+
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+    .text-balance {
+        text-wrap: balance;
+    }
 }
 
 @font-face {
-  font-family: 'Pretendard Variable';
-  font-weight: 45 920;
-  font-display: swap;
-  src: url('./public/static/fonts/PretendardVariable.woff2') format('woff2');
+    font-family: 'Pretendard Variable';
+    font-weight: 45 920;
+    font-display: swap;
+    src: url('./public/static/fonts/PretendardVariable.woff2') format('woff2');
 }
 
 :root {
-  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+header {
+    @apply text-gray-500;
+}
+
+header > div > p {
+    @apply text-black;
+    height: 100%;
+    flex: 1;
+    align-content: center;
+}
+
+header > div > nav {
+    height: 100%;
+    flex: 3;
+    align-content: center;
+}
+
+.header-nav_menu {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.header-nav_item {
+    height: 100%;
+    padding: 0 8px;
+}
+
+.header-nav_item > a {
+    padding: 12px 10px;
+    font-size: 18px;
+}
+
+.header-login_menu > button {
+    padding: 0 8px;
+}
+
+.header-login_menu > span {
+    @apply text-gray-400;
 }
