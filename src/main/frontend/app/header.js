@@ -1,41 +1,66 @@
-import SearchIcon from '@mui/icons-material/Search';
+'use client';
+
+import {useState} from "react";
+
+import CloseIcon from "@mui/icons-material/Close";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
 import Link from "next/link";
 
 export default function Header() {
-    const navMenu = [
-        ["소개", "/about"],
-        ["Q&A", "/qna"],
-    ];
+  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
 
-    return (
-        <header className={"bg-white h-16"}>
-            <div className={"toolbar_contents flex items-center justify-between w-11/12 h-full ml-auto mr-auto"}>
-                <p className={"text-3xl font-bold"}>
-                    <Link href={"/"}>게시판</Link>
-                </p>
-                <nav>
-                    <ul className={"header-nav_menu"}>
-                        {navMenu.map(([name, link], index) => (
-                            <li key={index} className={"header-nav_item content-center"}>
-                                <Link href={link}
-                                      className={"text-base rounded-lg hover:bg-gray-400 hover:bg-opacity-10"}>
-                                    {name}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-                <div className={"header-login_menu flex items-center"}>
-                    <div role={"button"} className={"text-sm p-2 relative"}>
-                        <SearchIcon/>
-                    </div>
-                    {/* TODO:: 로그인 페이지로 이동 구현 */}
-                    <button>로그인</button>
-                    <span>|</span>
-                    {/* TODO:: 회원가입 페이지로 이동 구현 */}
-                    <button>회원가입</button>
-                </div>
+  const navMenu = [
+    ["소개", "/about"],
+    ["Q&A", "/qna"],
+  ];
+
+  const toggleNavMenu = () => {
+    setIsNavMenuOpen(!isNavMenuOpen);
+  };
+
+  return (
+      <header>
+        <div className="container">
+          <div className="container_inner">
+            <div className="header-logo">
+              <Link href="/">BOARD</Link>
             </div>
-        </header>
-    );
+            <div className={`mobile-nav-menu`}>
+              <div role={"button"} className={"text-sm p-2 relative"}>
+                <SearchIcon className="text-gray-500"/>
+              </div>
+              <div role={"button"} className={"text-sm p-2 relative"}
+                   onClick={toggleNavMenu}>
+                {isNavMenuOpen ? <CloseIcon className="text-gray-500"/> :
+                    <MenuIcon className="text-gray-500"/>}
+              </div>
+            </div>
+            <div className={`nav_content ${isNavMenuOpen ? 'open' : ''}`}>
+              <div className="separator"></div>
+              <ul className={"nav-menu"}>
+                {
+                  navMenu.map((menu, index) => {
+                    return (
+                        <li className="nav-item">
+                          <Link
+                              href={menu[1]}>{menu[0]}</Link>
+                        </li>
+                    );
+                  })
+                }
+                <div className="login-container">
+                  <div role={"button"}
+                       className={"search-icon text-sm p-2 relative ml-14"}>
+                    <SearchIcon/>
+                  </div>
+                  <button>로그인</button>
+                  <button>회원가입</button>
+                </div>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </header>
+  );
 }
