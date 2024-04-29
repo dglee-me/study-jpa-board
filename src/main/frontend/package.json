@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "engines": {
-    "node": ">=21.7.1",
-    "yarn": ">=1.22.22"
+    "node": ">=20.12.2",
+    "yarn": ">=1.22.19"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
