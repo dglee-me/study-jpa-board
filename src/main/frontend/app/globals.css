@@ -98,18 +98,9 @@ header {
 
 .login-container {
   @apply flex items-center;
-  @apply max-sm:w-full;
-}
-
-.login-container > div.search-icon {
   @apply max-sm:hidden;
 }
 
 .login-container > button {
   @apply ml-5;
-  @apply max-sm:ml-0 max-sm:w-1/2 max-sm:pt-[18px] max-sm:pb-[18px] max-sm:pl-[20px] max-sm:pr-[20px];
-}
-
-.login-container > button:first-child {
-  @apply max-sm:mr-5;
 }

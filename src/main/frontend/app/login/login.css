@@ -1,0 +1,25 @@
+
+.header-logo {
+  @apply flex justify-center;
+}
+
+.input-error {
+  @apply flex;
+}
+
+.input-error > span {
+  @apply text-red-500;
+}
+
+
+.signup-area {
+  @apply flex mt-4 items-center;
+}
+
+.signup-hint {
+  @apply font-medium text-gray-600;
+}
+
+.signup-button {
+  @apply font-medium ml-2 p-1 text-blue-600;
+}
