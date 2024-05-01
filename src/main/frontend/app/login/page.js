@@ -66,7 +66,7 @@ export default function LoginPage() {
             return;
         }
 
-        axios.post('/api/auth/login', {
+        axios.post('/api/auth/token', {
             email: email,
             password: password
         }).then((res) => {
