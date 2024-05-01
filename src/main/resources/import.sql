@@ -1,0 +1,1 @@
+INSERT INTO USERS(email, user_name, password, created_at) VALUES('dglee.dev@gmail.com', '이동근', '$2a$10$2LG1GknLHCWg8HvYfm1nj.Z0QcSNHZuj3Qy/1qpYy5rWNQHnSTeya', '2024-05-01 17:29:01');

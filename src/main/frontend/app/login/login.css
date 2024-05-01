@@ -11,6 +11,9 @@
   @apply text-red-500;
 }
 
+label {
+  @apply text-gray-500;
+}
 
 .signup-area {
   @apply flex mt-4 items-center;
