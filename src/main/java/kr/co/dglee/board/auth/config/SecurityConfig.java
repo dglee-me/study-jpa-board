@@ -1,11 +1,14 @@
-package kr.co.dglee.board.config;
+package kr.co.dglee.board.auth.config;
 
 import java.util.Collections;
-import kr.co.dglee.board.auth.service.AuthService;
-import kr.co.dglee.board.auth.filter.CustomAuthenticationFilter;
-import kr.co.dglee.board.auth.handler.CustomAuthFailureHandler;
-import kr.co.dglee.board.auth.handler.CustomAuthSuccessHandler;
+import java.util.List;
+import kr.co.dglee.board.auth.filter.AuthenticationFilter;
+import kr.co.dglee.board.auth.filter.JwtAuthenticationFilter;
+import kr.co.dglee.board.auth.handler.AuthFailureHandler;
+import kr.co.dglee.board.auth.handler.AuthSuccessHandler;
 import kr.co.dglee.board.auth.provider.CustomAuthenticationProvider;
+import kr.co.dglee.board.auth.service.AuthService;
+import kr.co.dglee.board.auth.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -16,15 +19,18 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+  private final JwtUtil jwtUtil;
 
   @Bean
   public BCryptPasswordEncoder passwordEncoder() {
@@ -42,20 +48,21 @@ public class SecurityConfig {
   }
 
   @Bean
-  public CustomAuthenticationFilter customAuthenticationFilter(
+  public AuthenticationFilter customAuthenticationFilter(
       AuthenticationManager authenticationManager,
-      CustomAuthSuccessHandler customAuthSuccessHandler,
-      CustomAuthFailureHandler customAuthFailureHandler
+      AuthSuccessHandler authSuccessHandler,
+      AuthFailureHandler authFailureHandler
   ) {
-    CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager);
+    AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager);
 
     // 엔드포인트로 들어오는 요청을 CustomAuthenticationFilter에서 처리하도록 지정한다.
-    customAuthenticationFilter.setFilterProcessesUrl("/auth/token");
-    customAuthenticationFilter.setAuthenticationSuccessHandler(customAuthSuccessHandler);
-    customAuthenticationFilter.setAuthenticationFailureHandler(customAuthFailureHandler);
-    customAuthenticationFilter.afterPropertiesSet();
+    authenticationFilter.setFilterProcessesUrl("/auth/token");
+    authenticationFilter.setAuthenticationSuccessHandler(authSuccessHandler);
+    authenticationFilter.setAuthenticationFailureHandler(authFailureHandler);
 
-    return customAuthenticationFilter;
+    authenticationFilter.afterPropertiesSet();
+
+    return authenticationFilter;
   }
 
   /**
@@ -63,8 +70,8 @@ public class SecurityConfig {
    * 정의한다.
    */
   @Bean
-  public CustomAuthSuccessHandler customLoginSuccessHandler() {
-    return new CustomAuthSuccessHandler();
+  public AuthSuccessHandler customLoginSuccessHandler() {
+    return new AuthSuccessHandler(jwtUtil);
   }
 
   /**
@@ -72,8 +79,8 @@ public class SecurityConfig {
    * 정의한다.
    */
   @Bean
-  public CustomAuthFailureHandler customLoginFailureHandler() {
-    return new CustomAuthFailureHandler();
+  public AuthFailureHandler customLoginFailureHandler() {
+    return new AuthFailureHandler();
   }
 
 
@@ -92,35 +99,31 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationFilter authenticationFilter)
+  public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationFilter authenticationFilter)
       throws Exception {
     http
-        // CSRF 비활성화
         .csrf(AbstractHttpConfigurer::disable)
-
-        // 기본 인증 비활성화
         .httpBasic(AbstractHttpConfigurer::disable)
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화
 
         // 인증 필터 추가
-        .addFilterBefore(authenticationFilter, CustomAuthenticationFilter.class)
-
-        // 세션 비활성화
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), AuthenticationFilter.class)
+        .addFilterAt(authenticationFilter, AuthenticationFilter.class)
 
         .headers(
             headers ->
                 headers.frameOptions(
-                    HeadersConfigurer.FrameOptionsConfig::sameOrigin
+                    FrameOptionsConfig::sameOrigin
                 )
         )
 
         // CORS 설정
         .cors(
             cors -> cors.configurationSource(request -> {
-                  var config = new org.springframework.web.cors.CorsConfiguration();
+                  var config = new CorsConfiguration();
                   config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                  config.setAllowedMethods(java.util.List.of("*"));
-                  config.setAllowedHeaders(java.util.List.of("*"));
+                  config.setAllowedMethods(List.of("*"));
+                  config.setAllowedHeaders(List.of("*"));
                   config.setAllowCredentials(true);
                   config.setMaxAge(3600L);
                   return config;
